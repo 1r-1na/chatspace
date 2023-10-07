@@ -24,6 +24,8 @@
   "author": "1r-1na",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^8.51.0",
+    "eslint-plugin-react": "^7.33.2",
     "parcel-bundler": "^1.12.5"
   }
 }
