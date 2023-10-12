@@ -2,8 +2,10 @@
   "name": "chatspace",
   "version": "1.0.0",
   "description": "A PWA for chatting purposes.",
-  "main": "index.js",
+  "type": "module",
+  "default": "index.html",
   "dependencies": {
+    "@parcel/service-worker": "^2.9.3",
     "@types/node": "^16.18.54",
     "@types/react": "^18.2.22",
     "@types/react-dom": "^18.2.7",
@@ -19,13 +21,19 @@
   },
   "scripts": {
     "dev": "parcel public/index.html",
-    "build": "parcel build public/index.html"
+    "build": "parcel build public/index.html",
+    "start": "parcel",
+    "watch": "parcel watch public/index.html"
   },
   "author": "1r-1na",
   "license": "ISC",
   "devDependencies": {
+    "@parcel/packager-raw-url": "^2.10.0",
+    "@parcel/transformer-typescript-tsc": "^2.10.0",
+    "@parcel/transformer-webmanifest": "^2.10.0",
     "eslint": "^8.51.0",
     "eslint-plugin-react": "^7.33.2",
-    "parcel-bundler": "^1.12.5"
+    "parcel": "^2.10.0",
+    "process": "^0.11.10"
   }
 }

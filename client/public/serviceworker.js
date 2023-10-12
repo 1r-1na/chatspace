@@ -1,41 +1,20 @@
-const VERSION = 1;
-const ASSETS_CACHE_PREFIX = "pwa-assets";
-const ASSETS_CACHE_NAME = `${ASSETS_CACHE_PREFIX}-${VERSION}`;
-
-const self = this;
-
-// self.__WB__MANIFEST is to cache not only the html but also the js files or react app.
-// https://create-react-app.dev/docs/making-a-progressive-web-app/
-const ASSET_URLS = ["/", "index.html", "logo.png", "static"];
+import { manifest, version } from "@parcel/service-worker";
 
 // Install SW
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(ASSETS_CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSET_URLS);
-    })
-  );
-});
+async function install() {
+  const cache = await caches.open(version);
+  await cache.addAll(manifest);
+}
+addEventListener('install', e => e.waitUntil(install()));
 
-// Activate the SW
-self.addEventListener("activate", function (event) {
-  event.waitUntil(
-    (async function () {
-      const keys = await caches.keys();
-
-      return Promise.all(
-        keys.map((key) => {
-          if (
-            key.startsWith(ASSETS_CACHE_PREFIX) &&
-            key !== ASSETS_CACHE_NAME
-          ) {
-            return caches.delete(key);
-          }
-        })
-      );
-    })()
+// Activate SW
+async function activate() {
+  const keys = await caches.keys();
+  await Promise.all(
+    keys.map(key => key !== version && caches.delete(key))
   );
-});
+}
+addEventListener('activate', e => e.waitUntil(activate()));
 
 // Fetch
 const updateCache = (request) => {
@@ -59,19 +38,41 @@ const fetchFromCache = (request) =>
   caches.open(ASSETS_CACHE_NAME).then((cache) => cache.match(request));
 
 // Listen for requests
-self.addEventListener("fetch", (event) => {
-  const path = new URL(event.request.url).pathname;
-  if (path.includes("/images/")) {
-    event.respondWith(
-      fetchFromNetwork(event.request, 10000).catch(() =>
-        fetchFromCache(event.request)
-      )
-    );
-    event.waitUntil(updateCache(event.request));
-  } else {
-    // Cache only
-    event.respondWith(
-      caches.open(ASSETS_CACHE_NAME).then((cache) => cache.match(event.request)) 
-    );
-  }
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches
+      .match(event.request)
+      .then((response) => response || fetch(event.request)),
+  );
 });
+// self.addEventListener("fetch", function (event) {
+//   event.respondWith(
+//     caches.match(event.request).then((cachedResponse) => {
+//       const networkFetch = fetch(event.request).then((response) => {
+//         caches.open(version).then((cache) => {
+//           cache.put(event.request, response.clone());
+//         });
+//       });
+//       return cachedResponse || networkFetch;
+//     })
+//   );
+// });
+
+
+// async function cacheOnly(request) {
+//   const cachedResponse = await caches.match(request);
+//   if (cachedResponse) {
+//     console.log("Found response in cache:", cachedResponse);
+//     return cachedResponse;
+//   }
+//   return Response.error();
+// }
+
+// self.addEventListener("fetch", (event) => {
+//   if (
+//     event.request.destination === "script" ||
+//     event.request.destination === "style"
+//   ) {
+//     event.respondWith(cacheOnly(event.request));
+//   }
+// });

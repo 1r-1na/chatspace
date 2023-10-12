@@ -4,6 +4,7 @@ import { ParticipantList } from "./ParticipantList";
 import { UserSelection } from "./UserSelection";
 import { useState } from "react";
 import { useOfflineStatus } from "../context/useOfflineStatus";
+import "./Scroll.css";
 
 const Chatspace = () => {
   const isOffline = useOfflineStatus();

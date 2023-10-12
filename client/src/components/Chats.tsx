@@ -4,7 +4,6 @@ import { useMessages } from "../api/useMessages";
 import { FlexBox } from "./Chatspace";
 import styled from "styled-components";
 import { useOfflineStatus } from "../context/useOfflineStatus";
-import "./Scroll.css";
 
 const Chats = () => {
   const isOffline = useOfflineStatus();

@@ -25,6 +25,7 @@ const ParticipantList = ({ collapsed, onCollapse }: ParticipantListProps) => {
       {!collapsed &&
         conversations.map((c) => (
           <ListItem
+            key={c.id}
             active={c.id.toString() === conversationId}
             isFirst={c.id === conversations[0].id}
             onClick={() => onClickConversation(c)}
