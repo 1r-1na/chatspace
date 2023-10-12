@@ -5,7 +5,7 @@ node_modules/
 /.pnp/
 .pnp.js/
 .cache/
-.parcle-cache/
+.parcel-cache/
 
 # testing
 /coverage/
