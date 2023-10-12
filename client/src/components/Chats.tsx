@@ -28,12 +28,13 @@ const Chats = () => {
       style={{
         flexDirection: "column",
         justifyContent: "flex-end",
-        overflowY: "auto",
       }}
     >
-      {messages.map((m) => (
-        <Bubble received={m.from !== userName}>{m.message}</Bubble>
-      ))}
+      <ChatList>
+        {messages.map((m) => (
+          <Bubble received={m.from !== userName}>{m.message}</Bubble>
+        ))}
+      </ChatList>
       {conversationId && (
         <FlexBox style={{ height: "50px" }}>
           <Input
@@ -58,6 +59,12 @@ const Chats = () => {
     </FlexBox>
   );
 };
+
+const ChatList = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+`;
 
 const Button = styled.button`
   padding: 10px 20px;
