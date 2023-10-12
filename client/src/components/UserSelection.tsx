@@ -28,7 +28,9 @@ const UserSelection = () => {
             -- select a user --
           </option>
           {users.map((u) => (
-            <option value={u.username}>{u.fullname}</option>
+            <option key={u.username} value={u.username}>
+              {u.fullname}
+            </option>
           ))}
         </Select>
       </Container>
