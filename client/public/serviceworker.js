@@ -1,78 +1,40 @@
-import { manifest, version } from "@parcel/service-worker";
+import { version, manifest } from "@parcel/service-worker";
+const CACHE_IMAGES = "cache_images-v1";
 
 // Install SW
 async function install() {
   const cache = await caches.open(version);
   await cache.addAll(manifest);
 }
-addEventListener('install', e => e.waitUntil(install()));
+addEventListener("install", (e) => e.waitUntil(install()));
 
 // Activate SW
 async function activate() {
   const keys = await caches.keys();
-  await Promise.all(
-    keys.map(key => key !== version && caches.delete(key))
-  );
+  await Promise.all(keys.map((key) => key !== version && caches.delete(key)));
 }
-addEventListener('activate', e => e.waitUntil(activate()));
+addEventListener("activate", (e) => e.waitUntil(activate()));
 
-// Fetch
-const updateCache = (request) => {
-  caches
-    .open(ASSETS_CACHE_NAME)
-    .then((cache) =>
-      fetch(request).then((response) => cache.put(request, response))
-    );
+// Listen for requests
+const updateImageCache = (request, response) => {
+  if (request.url.includes("/images/")) {
+    caches.open(CACHE_IMAGES).then((cache) => cache.put(request, response));
+  }
 };
-const fetchFromNetwork = (request, timeout) => {
-  return new Promise((fullfill, reject) => {
-    const timeoutId = setTimeout(reject, timeout);
+
+const networkFetch = (request) => {
+  return new Promise((fullfill) => {
     fetch(request).then((response) => {
-      clearTimeout(timeoutId);
       fullfill(response);
-      updateCache(request);
+      updateImageCache(request, response.clone());
     });
   });
 };
-const fetchFromCache = (request) =>
-  caches.open(ASSETS_CACHE_NAME).then((cache) => cache.match(request));
 
-// Listen for requests
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches
-      .match(event.request)
-      .then((response) => response || fetch(event.request)),
+    caches.match(event.request).then((cachedResponse) => {
+      return cachedResponse || networkFetch(event.request);
+    })
   );
 });
-// self.addEventListener("fetch", function (event) {
-//   event.respondWith(
-//     caches.match(event.request).then((cachedResponse) => {
-//       const networkFetch = fetch(event.request).then((response) => {
-//         caches.open(version).then((cache) => {
-//           cache.put(event.request, response.clone());
-//         });
-//       });
-//       return cachedResponse || networkFetch;
-//     })
-//   );
-// });
-
-
-// async function cacheOnly(request) {
-//   const cachedResponse = await caches.match(request);
-//   if (cachedResponse) {
-//     console.log("Found response in cache:", cachedResponse);
-//     return cachedResponse;
-//   }
-//   return Response.error();
-// }
-
-// self.addEventListener("fetch", (event) => {
-//   if (
-//     event.request.destination === "script" ||
-//     event.request.destination === "style"
-//   ) {
-//     event.respondWith(cacheOnly(event.request));
-//   }
-// });
