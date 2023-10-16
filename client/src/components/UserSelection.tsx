@@ -48,6 +48,7 @@ const Image = styled.img`
 const Select = styled.select`
   align-items: center;
   text-align: center;
+  font-size: large;
   cursor: pointer;
   background-color: #1384c5;
   color: ivory;
