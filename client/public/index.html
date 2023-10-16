@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#000000" />
   <link rel="apple-touch-icon" href="./logo.png" />
-  <link rel="manifest" crossorigin="use-credentials" href="manifest.json" />
+  <link rel="manifest" href="manifest.json" />
 
   <title>Chat PWA</title>
 </head>
@@ -19,7 +19,9 @@
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker
-          .register(new URL("serviceworker.js", import.meta.url), { type: "module" })
+          .register(new URL("serviceworker.js", import.meta.url), {
+            type: "module",
+          })
           .then((reg) =>
             console.log("Successfully registered SW.", reg.scope)
           )
