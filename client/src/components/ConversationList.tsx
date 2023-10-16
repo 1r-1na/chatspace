@@ -2,23 +2,42 @@ import { useConversations } from "../api/useConversations";
 import { Conversation } from "../api/interfaces";
 import { useSearchParams } from "react-router-dom";
 import { styled } from "styled-components";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
-interface ParticipantListProps {
+interface ConversationListProps {
   collapsed: boolean;
   onCollapse: (isCollapsed: boolean) => void;
 }
-const ParticipantList = ({ collapsed, onCollapse }: ParticipantListProps) => {
+const ConversationList = ({ collapsed, onCollapse }: ConversationListProps) => {
   const [params, setParams] = useSearchParams();
-  const conversationId = useMemo(() => params?.get("conversation"), [params]);
   const userName = useMemo(() => params?.get("user"), [params]);
+  const conversationId = useMemo(() => params?.get("conversation"), [params]);
 
   const conversations = useConversations(userName);
 
-  const onClickConversation = (conversation: Conversation) => {
-    params.set("conversation", conversation.id.toString());
+  const setParamsConversationId = (conId: string) => {
+    params.set("conversation", conId);
     setParams(params);
   };
+
+  const onClickConversation = (conversation: Conversation) => {
+    setParamsConversationId(conversation.id.toString());
+  };
+
+  useEffect(() => {
+    if (userName && !conversationId) {
+      const conId = localStorage.getItem(userName);
+      if (conId) {
+        setParamsConversationId(conId);
+      }
+    }
+  }, [userName]);
+
+  useEffect(() => {
+    if (userName && conversationId) {
+      localStorage.setItem(userName, conversationId);
+    }
+  }, [userName, conversationId]);
 
   return (
     <List>
@@ -27,10 +46,12 @@ const ParticipantList = ({ collapsed, onCollapse }: ParticipantListProps) => {
           <ListItem
             key={c.id}
             active={c.id.toString() === conversationId}
-            isFirst={c.id === conversations[0].id}
+            isfirst={c.id === conversations[0].id}
             onClick={() => onClickConversation(c)}
           >
-            {c.participants.map((p) => p !== userName && <Box>{p}</Box>)}
+            {c.participants.map(
+              (p) => p !== userName && <Box key={p}>{p}</Box>
+            )}
           </ListItem>
         ))}
       <CollapseItem onClick={() => onCollapse(!collapsed)}>
@@ -51,13 +72,13 @@ const Box = styled.div`
 
 const ListItem = styled.li<{
   active?: boolean;
-  isFirst?: boolean;
+  isfirst?: boolean;
 }>`
   display: flex;
   align-items: center;
   justify-content: space-around;
   padding: 20px;
-  ${(props) => props.isFirst && "border-top: 1px solid ivory;"}
+  ${(props) => props.isfirst && "border-top: 1px solid ivory;"}
   border-bottom: 1px solid ivory;
   border-left: 1px solid ivory;
   border-right: 1px solid ivory;
@@ -96,4 +117,4 @@ const CollapseItem = styled(Box)`
   }
 `;
 
-export { ParticipantList };
+export { ConversationList as ParticipantList };

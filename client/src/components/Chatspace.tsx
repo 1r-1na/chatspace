@@ -1,6 +1,6 @@
 import { styled } from "styled-components";
 import { Chats } from "./Chats";
-import { ParticipantList } from "./ParticipantList";
+import { ParticipantList } from "./ConversationList";
 import { UserSelection } from "./UserSelection";
 import { useState } from "react";
 import { useOfflineStatus } from "../context/useOfflineStatus";
