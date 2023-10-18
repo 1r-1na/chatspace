@@ -10,7 +10,7 @@ const UserSelection = () => {
   const selectedUsername = useMemo(() => params.get("user"), [params]);
 
   const currentUser = useMemo(
-    () => users.find((u) => u.username === selectedUsername) ?? null,
+    () => users.find((u) => u.username === selectedUsername),
     [selectedUsername, users]
   );
 
@@ -19,12 +19,13 @@ const UserSelection = () => {
       <Container>
         {currentUser && <Image src={currentUser.image} />}
         <Select
-          value={selectedUsername ?? undefined}
+          defaultValue="default"
+          value={selectedUsername ?? "default"}
           onChange={(event) => {
             setParams(new URLSearchParams({ user: event.target.value }));
           }}
         >
-          <option disabled selected value={undefined}>
+          <option disabled value={"default"}>
             -- select a user --
           </option>
           {users.map((u) => (

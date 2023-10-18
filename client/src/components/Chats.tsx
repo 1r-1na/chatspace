@@ -32,7 +32,9 @@ const Chats = () => {
     >
       <ChatList>
         {messages.map((m) => (
-          <Bubble received={m.from !== userName}>{m.message}</Bubble>
+          <Bubble key={m.from} received={m.from !== userName}>
+            {m.message}
+          </Bubble>
         ))}
       </ChatList>
       {conversationId && (
