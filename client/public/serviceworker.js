@@ -1,5 +1,5 @@
 import { version, manifest } from "@parcel/service-worker";
-const CACHE_IMAGES = "cache_images-v1";
+const IMAGE_CACHE = "image-cache-v1";
 
 // Install SW
 async function install() {
@@ -11,14 +11,18 @@ addEventListener("install", (e) => e.waitUntil(install()));
 // Activate SW
 async function activate() {
   const keys = await caches.keys();
-  await Promise.all(keys.map((key) => key !== version && caches.delete(key)));
+  await Promise.all(
+    keys.map(
+      (key) => (key !== version || key !== IMAGE_CACHE) && caches.delete(key)
+    )
+  );
 }
 addEventListener("activate", (e) => e.waitUntil(activate()));
 
 // Listen for requests
 const updateImageCache = (request, response) => {
   if (request.url.includes("/images/")) {
-    caches.open(CACHE_IMAGES).then((cache) => cache.put(request, response));
+    caches.open(IMAGE_CACHE).then((cache) => cache.put(request, response));
   }
 };
 
