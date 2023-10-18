@@ -26,12 +26,25 @@ const updateImageCache = (request, response) => {
   }
 };
 
+const updateIndexDB = (request, response) => {
+  if (
+    request.method === "POST" &&
+    request.method.url.includes("/conversations/")
+  ) {
+  }
+};
+
 const networkFetch = (request) => {
   return new Promise((fullfill) => {
     fetch(request).then((response) => {
       fullfill(response);
-      updateImageCache(request, response.clone());
-    });
+      if (response.ok) {
+        updateImageCache(request, response.clone());
+        updateIndexDB(request, response.clone());
+      }
+    }).catch(
+      // todo return from indexdb
+    );
   });
 };
 
