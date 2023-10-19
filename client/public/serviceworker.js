@@ -14,7 +14,7 @@ async function activate() {
   const keys = await caches.keys();
   await Promise.all(
     keys.map(
-      (key) => (key !== version || key !== IMAGE_CACHE) && caches.delete(key)
+      (key) => key !== version && key !== IMAGE_CACHE && caches.delete(key)
     )
   );
 }
@@ -57,13 +57,21 @@ const updateIndexDB = async (request, response) => {
   }
 };
 
+function createResponse(obj) {
+  const blob = new Blob([JSON.stringify(obj)], {
+    type: "application/json",
+  });
+  const options = { status: 200, ok: true };
+  return new Response(blob, options);
+}
+
 const readIndexDB = async (request) => {
   const requestUrl = new URL(request.url);
 
   // GET /users
   if (request.method === "GET" && requestUrl.pathname.match(/^\/users$/)) {
     const users = await db.getUsers();
-    return users;
+    return createResponse(users);
   }
 
   // GET /conversations
@@ -74,7 +82,7 @@ const readIndexDB = async (request) => {
     const username = requestUrl.searchParams.get("user");
     const conversations = await db.getConversations(username);
 
-    return conversations;
+    return createResponse(conversations);
   }
 
   // GET /conversations/:id/messages
@@ -84,9 +92,8 @@ const readIndexDB = async (request) => {
   ) {
     const conversationId = requestUrl.pathname.split("/")[2];
     const messagesPerCoversation = await db.getMessages(conversationId);
-    return messagesPerCoversation.messages;
+    return createResponse(messagesPerCoversation.messages);
   }
-  return; //object
 };
 
 const networkOrDBFetch = (request) => {
